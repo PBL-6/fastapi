@@ -1,7 +1,6 @@
 import os
 import cv2
 import pickle
-import time
 from skimage.metrics import structural_similarity as ssim
 
 correl_threshold = 0.5
@@ -154,17 +153,16 @@ def gen_sift_prediction(image_name):
 def result(image_name):
     predictions = gen_sift_prediction(image_name)
 
-    if not predictions[0][1]:
+    if predictions:
+        return predictions[0][1]
+    else:
         return None
 
-    return predictions[0][1]
 
-
-def main(image_name="bb4de80f-2307-45f4-8aa8-4a030d1a5de2.jpg"):
+def main(image_name):
     # calculate_train_images_histogram()
     # start_time = time.time()
-    books = result(image_name)
-    return books
+    return result(image_name)
     # elapsed_time = time.time() - start_time
     # print(f"Elapsed time: {elapsed_time} seconds")
 
