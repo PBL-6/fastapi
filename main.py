@@ -218,7 +218,7 @@ async def scrapping_books(pages: int = Form(...), image_width: int = Form(...), 
 
 @app.post("/admin/books")
 async def create_books(title: str = Form(...), author: str = Form(...), category: str = Form(...),
-                       published_at: str = Form(...), image: UploadFile = File(...)):
+                       published_at: str = Form(...), available: bool = Form(...), image: UploadFile = File(...)):
     try:
         if image.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
             raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="Unsupported image type")
@@ -226,7 +226,7 @@ async def create_books(title: str = Form(...), author: str = Form(...), category
         image_name = await resize_image(image, 'train_images')
 
         with Session(engine) as session:
-            book = Book(title=title, author=author, category=category, published_at=published_at, image=image_name)
+            book = Book(title=title, author=author, category=category, is_available=available, published_at=published_at, image=image_name)
             session.add(book)
             session.commit()
             session.refresh(book)
@@ -246,7 +246,7 @@ async def create_books(title: str = Form(...), author: str = Form(...), category
 
 @app.put("/admin/books/{book_id}")
 async def update_book(book_id: int, title: str = Form(...), author: str = Form(...), category: str = Form(...),
-                      published_at: str = Form(...), image: UploadFile = File(None)):
+                      published_at: str = Form(...), available: bool = Form(...), image: UploadFile = File(None)):
     try:
         with Session(engine) as session:
 
@@ -258,6 +258,7 @@ async def update_book(book_id: int, title: str = Form(...), author: str = Form(.
             book.title = title
             book.author = author
             book.category = category
+            book.is_available = available
             book.published_at = published_at
 
             if image:
