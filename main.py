@@ -15,6 +15,7 @@ import datetime
 import translators as ts
 from joblib import load
 from urllib3 import disable_warnings
+from dotenv import load_dotenv
 
 
 class Book(SQLModel, table=True):
@@ -45,8 +46,9 @@ class SearchBook(SQLModel, table=True):
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
 
 
+load_dotenv()
 IMAGEDIR = "query_images/"
-DATABASE_URL = "mysql://root:@localhost:3306/pbl-6"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 database = Database(DATABASE_URL)
 engine = create_engine(DATABASE_URL)
@@ -84,7 +86,7 @@ async def startup():
     label = load('label.pkl')
     vectorizer = load('vectorizer.pkl')
     model = load('model.pkl')
-    # create_database()
+    create_database()
 
 
 @app.on_event("shutdown")
@@ -226,7 +228,8 @@ async def create_books(title: str = Form(...), author: str = Form(...), category
         image_name = await resize_image(image, 'train_images')
 
         with Session(engine) as session:
-            book = Book(title=title, author=author, category=category, is_available=available, published_at=published_at, image=image_name)
+            book = Book(title=title, author=author, category=category, is_available=available,
+                        published_at=published_at, image=image_name)
             session.add(book)
             session.commit()
             session.refresh(book)
