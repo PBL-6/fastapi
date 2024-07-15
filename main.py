@@ -1,7 +1,7 @@
 from fastapi import File, UploadFile, FastAPI, HTTPException, status, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
+from PIL import Image, ImageOps, ImageEnhance
 from io import BytesIO
 from uuid import uuid4
 from sqlmodel import Field, SQLModel, create_engine, Session
@@ -86,7 +86,7 @@ async def startup():
     label = load('label.pkl')
     vectorizer = load('vectorizer.pkl')
     model = load('model.pkl')
-    create_database()
+    # create_database()
 
 
 @app.on_event("shutdown")
@@ -184,13 +184,13 @@ def scrapping(pages, width, height):
 async def resize_image(image, location):
     try:
         image = Image.open(BytesIO(await image.read()))
-        image = image.convert("RGB")
+        image = image.convert("RGBA")
 
         width = 600
         height = 800
 
-        resized_image = image.resize((width, height), Image.Resampling.LANCZOS)
-        image_name = f"{uuid4()}.jpg"
+        resized_image = image.resize((width, height))
+        image_name = f"{uuid4()}.png"
 
         resized_image.save(f"{location}/{image_name}")
 
@@ -212,6 +212,7 @@ async def scrapping_books(pages: int = Form(...), image_width: int = Form(...), 
             "message": "scrapping success.",
             "data": None
         }
+
 
     except Exception as e:
         print(f"Error while resizing image: {e}")
