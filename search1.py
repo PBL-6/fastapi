@@ -43,6 +43,11 @@ def calculate_train_images_histogram():
         if image is None:
             continue
 
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        channels = cv2.split(image)
+        clahe_channels = [clahe.apply(channel) for channel in channels]
+        image = cv2.merge(clahe_channels)
+
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         hist = cv2.calcHist([image], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
         hist = cv2.normalize(hist, None)

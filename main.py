@@ -16,6 +16,7 @@ import translators as ts
 from joblib import load
 from urllib3 import disable_warnings
 from dotenv import load_dotenv
+import cv2
 
 
 class Book(SQLModel, table=True):
@@ -212,7 +213,6 @@ async def scrapping_books(pages: int = Form(...), image_width: int = Form(...), 
             "message": "scrapping success.",
             "data": None
         }
-
 
     except Exception as e:
         print(f"Error while resizing image: {e}")
