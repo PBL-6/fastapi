@@ -130,19 +130,29 @@ def scrape_page(url, directory, target, width=600, height=800):
             soup = BeautifulSoup(response.text, 'html.parser')
             target_divs = soup.find_all('div', class_=target)
             for target_div in target_divs:
-
+                # mencari elemen img dalam variabel target_div yang memiliki kelas img-thumbnail
                 img_tag = target_div.find('img', class_="img-thumbnail")
-
+                # mengecek apakah variabel img_tag bernilai None jika iya fungsi akan berhenti
                 if img_tag is None:
                     return
-
+                # mengambil atribut src dari elemen img yang ditemukan
                 img_url = img_tag.get('src')
+                # membuat url baru dengan menambahkan parameter width = 600 dan height = 800
                 img_custom_url = f"{img_url}&width={width}&height={height}"
                 img_full_url = f"https://opac.pnj.ac.id/{img_custom_url}"
+                # memanggil fungsi download_image
                 img_name = download_image(img_full_url, directory)
-
+                # mencari elemen a dalam variabel target_div yang memiliki kelas titleField
+                # kemudian mengambil teks dari elemen tersebut
+                # menghilangkan spasi di awal dan akhir
+                # mengubah teks menjadi format title case
                 title = target_div.find('a', class_="titleField").text.strip().title()
+                # mencari semua elemen span dalam variabel target_div yang memiliki kelas author-name
                 author_divs = target_div.find_all('span', class_='author-name')
+                # membuat daftar teks dari elemen - elemen dalam variabel author_divs
+                # menghilangkan spasi di awal dan akhir
+                # mengubah teks menjadi format title case
+                # menggabungkan teks - teks tersebut dengan -
                 author = ' - '.join([tag.text.strip().title() for tag in author_divs])
 
                 category = classify(title)
